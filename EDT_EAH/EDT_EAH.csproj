@@ -93,5 +93,17 @@
       <Name>EDT_EAH_Algorithm</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="logo_educ.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="acver-2017-bleu-region_acad.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="chsf.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cropped-LOGO_rea.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

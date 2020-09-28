@@ -39,13 +39,13 @@ namespace EDT_EAH
         private void Compute_Click(object sender, EventArgs e)
         {
 
-            if (this.CheckFileIsOpened(cStudentFile) == false)
+            if (this.CheckFileIsOpened(cStudentFile))
             {
                 MessageBox.Show("Veuillez fermer le fichier Meilleur_planning_eleves.xlsx", "Erreur");
                 return;
             }
 
-            if (this.CheckFileIsOpened(cTeacherFile) == false)
+            if (this.CheckFileIsOpened(cTeacherFile))
             {
                 MessageBox.Show("Veuillez fermer le fichier Meilleur_planning_profs.xlsx", "Erreur");
                 return;
