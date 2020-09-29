@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using EAH.DataModel;
 using EDT_EAH_Algorithm;
+using MaterialSkin;
+using MaterialSkin.Controls;
 
 namespace EDT_EAH
 {
-    public partial class Form1 : Form
+    public partial class Form1 : MaterialForm
     {
         private const string cSourceFile = @".\EDT_EAH.xlsx";
 
@@ -18,6 +21,11 @@ namespace EDT_EAH
         public Form1()
         {
             InitializeComponent();
+
+            var materialSkinManager = MaterialSkinManager.Instance;
+            materialSkinManager.AddFormToManage(this);
+            materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.LightGreen800, Primary.LightGreen900, Primary.LightGreen500, Accent.LightGreen200, TextShade.WHITE);
         }
 
         private void Manage_Click(object sender, EventArgs e)
@@ -57,14 +65,36 @@ namespace EDT_EAH
 
             SimpleAlgorithm lAlgorithm = new SimpleAlgorithm();
             List<string> lResult = lAlgorithm.Compute(lDatabase);
+            if (lResult.Any())
+            {
+                MessageBox.Show("Planning elaboré avec succès", "Information");
 
-            DateTime lDate = DateTime.Parse(lDatabase.Date);
+                DateTime lDate = DateTime.Parse(lDatabase.Date);
 
-            StudentPlanningExporter lExporter = new StudentPlanningExporter();
-            lExporter.Write(@".\", "Meilleur_planning_eleves", lResult, lDate, lDatabase);
+                StudentPlanningExporter lExporter = new StudentPlanningExporter();
+                lExporter.Write(@".\", "Meilleur_planning_eleves", lResult, lDate, lDatabase);
 
-            TeacherPlanningExporter lExporter2 = new TeacherPlanningExporter();
-            lExporter2.Write(@".\", "Meilleur_planning_profs", lResult, lDate, lDatabase);
+                TeacherPlanningExporter lExporter2 = new TeacherPlanningExporter();
+                lExporter2.Write(@".\", "Meilleur_planning_profs", lResult, lDate, lDatabase);
+
+                if (File.Exists(cTeacherFile))
+                {
+                    if (this.CheckFileIsOpened(cTeacherFile) == false)
+                    {
+                        System.Diagnostics.Process.Start(cTeacherFile);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Impossible de trouver le fichier Meilleur_planning_profs.xslx", "Erreur");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Trop de contraintes appliquées", "Information");
+            }
+
+            
         }
 
         private void DisplayStudent_Click(object sender, EventArgs e)
@@ -99,20 +129,20 @@ namespace EDT_EAH
 
         bool CheckFileIsOpened(string pFilepath)
         {
-            bool lIsReady = true;
+            bool IsOpened = false;
             if (File.Exists(pFilepath))
             {
                 try
                 {
                     File.Open(pFilepath, FileMode.Open, FileAccess.Write, FileShare.None).Dispose();
-                    lIsReady = false;
+                    IsOpened = false;
                 }
                 catch (IOException)
                 {
-
+                    IsOpened = true;
                 }
             }
-            return lIsReady;
+            return IsOpened;
         }
     }
 }
