@@ -63,7 +63,7 @@
             this.DisplayStudent.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.DisplayStudent.Depth = 0;
             this.DisplayStudent.Icon = null;
-            this.DisplayStudent.Location = new System.Drawing.Point(32, 265);
+            this.DisplayStudent.Location = new System.Drawing.Point(32, 285);
             this.DisplayStudent.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.DisplayStudent.MouseState = MaterialSkin.MouseState.HOVER;
             this.DisplayStudent.Name = "DisplayStudent";
@@ -80,7 +80,7 @@
             this.DisplayTeachers.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.DisplayTeachers.Depth = 0;
             this.DisplayTeachers.Icon = null;
-            this.DisplayTeachers.Location = new System.Drawing.Point(32, 363);
+            this.DisplayTeachers.Location = new System.Drawing.Point(32, 389);
             this.DisplayTeachers.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.DisplayTeachers.MouseState = MaterialSkin.MouseState.HOVER;
             this.DisplayTeachers.Name = "DisplayTeachers";
@@ -151,8 +151,8 @@
             this.Controls.Add(this.DisplayStudent);
             this.Controls.Add(this.Manage);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(700, 700);
-            this.MinimumSize = new System.Drawing.Size(430, 400);
+            this.MaximumSize = new System.Drawing.Size(700, 440);
+            this.MinimumSize = new System.Drawing.Size(700, 440);
             this.Name = "Form1";
             this.RightToLeftLayout = true;
             this.Text = "Empoi du temps EAH";
