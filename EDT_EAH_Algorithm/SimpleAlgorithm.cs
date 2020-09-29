@@ -100,6 +100,54 @@ namespace EDT_EAH_Algorithm
                 }
             }
 
+            // Avoid two consecutives slots with the same student.
+            // Set available slots for students.
+            foreach (var lStudent in lDayStudents)
+            {
+
+                for (int lHourIndex = 0; lHourIndex < lWorkDay.OpeningHours.Count; lHourIndex++)
+                {
+                    // Avoid two consecutives slots if the ratio is less than 0.5
+                    if (lHourIndex > 0)
+                    {
+                        List<IntVar> lHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex]) && pDecision.Name().Contains(lStudent.Name)).ToList();
+                        List<IntVar> lPreviousHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex - 1]) && pDecision.Name().Contains(lStudent.Name)).ToList();
+                        List<IntVar> lAll = new List<IntVar>();
+                        lAll.AddRange(lHourDecisions);
+                        lAll.AddRange(lPreviousHourDecisions);
+                        double lNbFields = lStudent.FieldAreas.Where(pItem => pItem.Code != "NOP").Count();
+                        double lNbSlots = lStudent.IsPresent.Where(pItem => pItem != "NOP").Count();
+                        double lRatio = lNbFields / lNbSlots;
+                        if (lRatio <= 0.5)
+                        {
+                            lModel.Add(LinearExpr.Sum(lAll.ToArray()) < 2);
+                        }
+                        else
+                        {
+                            lModel.Add(LinearExpr.Sum(lAll.ToArray()) <= 2);
+                        }
+                    }
+
+                    if (lHourIndex > 1)
+                    {
+                        List<IntVar> lHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex]) && pDecision.Name().Contains(lStudent.Name)).ToList();
+                        List<IntVar> lPreviousHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex - 1]) && pDecision.Name().Contains(lStudent.Name)).ToList();
+                        List<IntVar> lPreviousPreviousHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex - 2]) && pDecision.Name().Contains(lStudent.Name)).ToList();
+                        List<IntVar> lAll = new List<IntVar>();
+                        lAll.AddRange(lHourDecisions);
+                        lAll.AddRange(lPreviousHourDecisions);
+                        lAll.AddRange(lPreviousPreviousHourDecisions);
+                        double lNbFields = lStudent.FieldAreas.Where(pItem => pItem.Code != "NOP").Count();
+                        double lNbSlots = lStudent.IsPresent.Where(pItem => pItem != "NOP").Count();
+                        double lRatio = lNbFields / lNbSlots;
+                        if (lRatio <= 0.75)
+                        {
+                            lModel.Add(LinearExpr.Sum(lAll.ToArray()) < 3);
+                        }
+                    }
+                }
+            }
+
             lModel.Maximize(LinearExpr.Sum(lVariables.ToArray()));
 
 
