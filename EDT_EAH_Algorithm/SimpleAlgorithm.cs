@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using EAH.DataModel;
@@ -22,7 +23,6 @@ namespace EDT_EAH_Algorithm
             WorkDay lWorkDay = pSource.WorkDays.First(pItem => pItem.Name == pSource.DayOfWeek);
             foreach (var lStudent in lDayStudents)
             {
-
                 //  Now, create all variables.
                 foreach (var lTeacher in lDayTeachers)
                 {
@@ -80,18 +80,9 @@ namespace EDT_EAH_Algorithm
                 foreach (var lOpeningHour in lWorkDay.OpeningHours)
                 {
                     List<IntVar> lHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lOpeningHour) && pDecision.Name().Contains(lTeacher.Name)).ToList();
-                    if (lIndex < lTeacher.IsPresent.Count)
+                    if (lTeacher.IsPresent.FirstOrDefault(pItem => pItem.Contains(lOpeningHour) && pItem.Contains(lWorkDay.Name)) != null)
                     {
-                        string[] lDayHour = lTeacher.IsPresent[lIndex].Split(new string[] { "@" }, StringSplitOptions.RemoveEmptyEntries);
-                        if (lDayHour.Length == 2 && lDayHour[1] == lOpeningHour)
-                        {
-                            lModel.Add(LinearExpr.Sum(lHourDecisions.ToArray()) <= 1);
-                            lIndex++;
-                        }
-                        else
-                        {
-                            lModel.Add(LinearExpr.Sum(lHourDecisions.ToArray()) == 0);
-                        }
+                        lModel.Add(LinearExpr.Sum(lHourDecisions.ToArray()) <= 1);
                     }
                     else
                     {
@@ -100,57 +91,8 @@ namespace EDT_EAH_Algorithm
                 }
             }
 
-            // Avoid two consecutives slots with the same student.
-            // Set available slots for students.
-            foreach (var lStudent in lDayStudents)
-            {
-
-                for (int lHourIndex = 0; lHourIndex < lWorkDay.OpeningHours.Count; lHourIndex++)
-                {
-                    // Avoid two consecutives slots if the ratio is less than 0.5
-                    if (lHourIndex > 0)
-                    {
-                        List<IntVar> lHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex]) && pDecision.Name().Contains(lStudent.Name)).ToList();
-                        List<IntVar> lPreviousHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex - 1]) && pDecision.Name().Contains(lStudent.Name)).ToList();
-                        List<IntVar> lAll = new List<IntVar>();
-                        lAll.AddRange(lHourDecisions);
-                        lAll.AddRange(lPreviousHourDecisions);
-                        double lNbFields = lStudent.FieldAreas.Where(pItem => pItem.Code != "NOP").Count();
-                        double lNbSlots = lStudent.IsPresent.Where(pItem => pItem != "NOP").Count();
-                        double lRatio = lNbFields / lNbSlots;
-                        if (lRatio <= 0.5)
-                        {
-                            lModel.Add(LinearExpr.Sum(lAll.ToArray()) < 2);
-                        }
-                        else
-                        {
-                            lModel.Add(LinearExpr.Sum(lAll.ToArray()) <= 2);
-                        }
-                    }
-
-                    if (lHourIndex > 1)
-                    {
-                        List<IntVar> lHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex]) && pDecision.Name().Contains(lStudent.Name)).ToList();
-                        List<IntVar> lPreviousHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex - 1]) && pDecision.Name().Contains(lStudent.Name)).ToList();
-                        List<IntVar> lPreviousPreviousHourDecisions = lVariables.Where(pDecision => pDecision.Name().Contains(lWorkDay.OpeningHours[lHourIndex - 2]) && pDecision.Name().Contains(lStudent.Name)).ToList();
-                        List<IntVar> lAll = new List<IntVar>();
-                        lAll.AddRange(lHourDecisions);
-                        lAll.AddRange(lPreviousHourDecisions);
-                        lAll.AddRange(lPreviousPreviousHourDecisions);
-                        double lNbFields = lStudent.FieldAreas.Where(pItem => pItem.Code != "NOP").Count();
-                        double lNbSlots = lStudent.IsPresent.Where(pItem => pItem != "NOP").Count();
-                        double lRatio = lNbFields / lNbSlots;
-                        if (lRatio <= 0.75)
-                        {
-                            lModel.Add(LinearExpr.Sum(lAll.ToArray()) < 3);
-                        }
-                    }
-                }
-            }
-
             lModel.Maximize(LinearExpr.Sum(lVariables.ToArray()));
-
-
+            
             List<string> lResult = new List<string>();
             CpSolver lSolver = new CpSolver();
             CpSolverStatus lStatus = lSolver.Solve(lModel);
@@ -162,7 +104,12 @@ namespace EDT_EAH_Algorithm
                     if (lSolver.Value(lVariable) == 1)
                     {
                         string[] lValues = lVariable.Name().Split(new string[] { "_SEP_" }, StringSplitOptions.RemoveEmptyEntries);
-                        lResult.Add(lValues[0] + "@" + lWorkDay.Name + "@" + lValues[2] + "@" + lValues[1] + "@" + "No desc");
+
+                        Teacher lTeacher = lDayTeachers.FirstOrDefault(pItem => pItem.Name == lValues[1]);
+                        if (lTeacher != null)
+                        {
+                            lResult.Add(lValues[0] + "@" + lWorkDay.Name + "@" + lValues[2] + "@" + lValues[1] + "@" + lTeacher.FieldAreas.FirstOrDefault().Description);
+                        }
                     }
                 }
             }

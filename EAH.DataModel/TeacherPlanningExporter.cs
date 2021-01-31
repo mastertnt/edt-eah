@@ -22,7 +22,7 @@ namespace EAH.DataModel
 
                 for (int lTeacherIndex = 0; lTeacherIndex < lDayTeachers.Count; lTeacherIndex++)
                 {
-                    lPackage.Workbook.Worksheets[0].Cells[2, lColIndex + lTeacherIndex].Value = lDayTeachers[lTeacherIndex].Name;
+                    lPackage.Workbook.Worksheets[0].Cells[2, lColIndex + lTeacherIndex].Value = lDayTeachers[lTeacherIndex].Name + Environment.NewLine + lDayTeachers[lTeacherIndex].FieldAreas.FirstOrDefault().Description;
                     int lRowIndex = 3;
                     while (lPackage.Workbook.Worksheets[0].Cells[lRowIndex, 1].Value != null)
                     {

@@ -15,16 +15,12 @@ namespace EAH.DataModel
                 // Write the date.
                 lPackage.Workbook.Worksheets[0].Cells["C1"].Value = pDate.ToShortDateString();
 
-                // Write the student name.
+                // Write the student name and room code.
                 int lRowIndex = 3;
-                while (lPackage.Workbook.Worksheets[0].Cells[lRowIndex, 1].Value != null)
+                foreach (Student lStudent in pDatabase.Students)
                 {
-                    string lRoomCode = lPackage.Workbook.Worksheets[0].Cells[lRowIndex, 1].Value.ToString();
-                    Student lStudent = pDatabase.Students.FirstOrDefault(pStudent => pStudent.RoomCode == lRoomCode);
-                    if (lStudent != null)
-                    {
-                        lPackage.Workbook.Worksheets[0].Cells[lRowIndex, 2].Value = lStudent.Name;
-                    }
+                    lPackage.Workbook.Worksheets[0].Cells[lRowIndex, 1].Value = lStudent.RoomCode;
+                    lPackage.Workbook.Worksheets[0].Cells[lRowIndex, 2].Value = lStudent.Name;
                     lRowIndex++;
                 }
 
@@ -34,7 +30,7 @@ namespace EAH.DataModel
                     if (lSlotInfos.Length == 5)
                     {
                         lRowIndex = 3;
-                        bool lIsFound = false;
+                        bool lIsFound = false;  
                         while (lIsFound == false)
                         {
                             if (lPackage.Workbook.Worksheets[0].Cells[lRowIndex, 2].Value != null)

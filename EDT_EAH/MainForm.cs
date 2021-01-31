@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using EAH.DataModel;
 using EDT_EAH_Algorithm;
@@ -20,15 +21,16 @@ namespace EDT_EAH
 
         public Form1()
         {
-            InitializeComponent();
-
-            var materialSkinManager = MaterialSkinManager.Instance;
-            materialSkinManager.AddFormToManage(this);
-            materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
-            materialSkinManager.ColorScheme = new ColorScheme(Primary.LightGreen800, Primary.LightGreen900, Primary.LightGreen500, Accent.LightGreen200, TextShade.WHITE);
+            this.InitializeComponent();
+            this.Text = "Optitan v" + Assembly.GetExecutingAssembly().GetName().Version;
+            
+            var lMaterialSkinManager = MaterialSkinManager.Instance;
+            lMaterialSkinManager.AddFormToManage(this);
+            lMaterialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
+            lMaterialSkinManager.ColorScheme = new ColorScheme(Primary.LightGreen800, Primary.LightGreen900, Primary.LightGreen500, Accent.LightGreen200, TextShade.WHITE);
         }
 
-        private void Manage_Click(object sender, EventArgs e)
+        private void Manage_Click(object pSender, EventArgs pEventArgs)
         {
             if (File.Exists(cSourceFile))
             {
@@ -44,7 +46,7 @@ namespace EDT_EAH
             
         }
 
-        private void Compute_Click(object sender, EventArgs e)
+        private void Compute_Click(object pSender, EventArgs pEventArgs)
         {
 
             if (this.CheckFileIsOpened(cStudentFile))
@@ -58,8 +60,7 @@ namespace EDT_EAH
                 MessageBox.Show("Veuillez fermer le fichier Meilleur_planning_profs.xlsx", "Erreur");
                 return;
             }
-
-
+            
             Database lDatabase = new Database();
             lDatabase.Initialize(cSourceFile);
 
@@ -97,7 +98,7 @@ namespace EDT_EAH
             
         }
 
-        private void DisplayStudent_Click(object sender, EventArgs e)
+        private void DisplayStudent_Click(object pSender, EventArgs pEventArgs)
         {
             if (File.Exists(cStudentFile))
             {
@@ -112,7 +113,7 @@ namespace EDT_EAH
             }
         }
 
-        private void DisplayTeachers_Click(object sender, EventArgs e)
+        private void DisplayTeachers_Click(object pSender, EventArgs pEventArgs)
         {
             if (File.Exists(cTeacherFile))
             {
